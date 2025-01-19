@@ -17,9 +17,13 @@ def main():
     ratings_df['Directors'] = ratings_df['Directors'].str.split(',').str[0]
     ratings_df.rename(columns={'Directors': 'Director'}, inplace=True)
 
+    # Convert to long-form data
+    ratings_df = ratings_df['Cast'].str.split(', ')
+    ratings_df = ratings_df.explode('Cast')
 
-def long_form(df):
-    pass
+    print(ratings_df)
+
+     
 
 
 if __name__ == '__main__':
