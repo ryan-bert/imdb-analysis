@@ -24,7 +24,7 @@ def main():
         try:
             # Get the cast for the title
             cast_list = None
-            if row['Title Type'] == 'TV Series' or row['Title Type'] == 'TV Mini-Series':
+            if row['Title Type'] == 'TV Series' or row['Title Type'] == 'TV Mini Series':
                 cast_list = get_series_cast(title_id)
             else:
                 cast_list = get_movie_cast(title_id)
