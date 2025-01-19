@@ -19,15 +19,16 @@ def main():
 
     # Convert to long-form data
     ratings_df['Cast'] = ratings_df['Cast'].str.split(', ')
-    ratings_df = ratings_df.explode('Cast').reset_index(drop=True)
+    actors_long = ratings_df.explode('Cast').reset_index(drop=True)
 
     # Rename and reorder columns to make Actor the first column
-    ratings_df.rename(columns={'Cast': 'Actor'}, inplace=True)
-    columns_order = ['Actor'] + [col for col in ratings_df.columns if col != 'Actor']
-    ratings_df = ratings_df[columns_order]
+    actors_long.rename(columns={'Cast': 'Actor'}, inplace=True)
+    columns_order = ['Actor'] + [col for col in actors_long.columns if col != 'Actor']
+    actors_long = actors_long[columns_order]
 
     # Save the updated DataFrame back to a CSV
-    updated_csv_path = os.path.join(DATA_DIR, 'actors_long.csv')
+    long_csv_path = os.path.join(DATA_DIR, 'actors_long.csv')
+    actors_long.to_csv(long_csv_path, index=False)
 
 
 if __name__ == '__main__':
