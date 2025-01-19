@@ -50,6 +50,37 @@ def main():
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     print(f"Table saved to {output_path}")
     
+    print(actors_long)
+
+    # Group by Director and Actor to calculate collaborations and ratings
+    director_actor_summary = actors_long.groupby(['Director', 'Actor']).agg(
+        Collaborations=('Title', 'size'),
+        Avg_IMDb_Rating=('IMDb Rating', lambda x: round(x.mean(), 2)),
+        My_Avg_Rating=('Your Rating', lambda x: round(x.mean(), 2))
+    ).reset_index()
+    # Sort by Collaborations and then My_Avg_Rating
+    director_actor_summary = director_actor_summary.sort_values(by=['Collaborations', 'My_Avg_Rating'], ascending=[False, False])
+
+    # Rename columns
+    director_actor_summary.rename(columns={'Avg_IMDb_Rating': 'Avg IMDb Rating', 'My_Avg_Rating': 'My Avg Rating'}, inplace=True)
+
+    # Create table of top 20 collaborations
+    top_collaborations = director_actor_summary.head(20)
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.axis('off')
+    table = ax.table(
+        cellText=top_collaborations.values,
+        colLabels=top_collaborations.columns,
+        cellLoc='center',
+        loc='center'
+    )
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.auto_set_column_width(col=list(range(len(top_collaborations.columns))))
+    # Save the table as a PNG image
+    output_path = os.path.join(OUTPUT_DIR, 'top_collaborations_table.png')
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+
     # Load the original ratings data
     ratings_df = pd.read_csv(os.path.join(DATA_DIR, 'my_ratings.csv'))
 
