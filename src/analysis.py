@@ -48,9 +48,6 @@ def main():
     # Save the table as a PNG image
     output_path = os.path.join(OUTPUT_DIR, 'favorite_actors_table.png')
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"Table saved to {output_path}")
-    
-    print(actors_long)
 
     # Group by Director and Actor to calculate collaborations and ratings
     director_actor_summary = actors_long.groupby(['Director', 'Actor']).agg(
@@ -83,6 +80,29 @@ def main():
 
     # Load the original ratings data
     ratings_df = pd.read_csv(os.path.join(DATA_DIR, 'my_ratings.csv'))
+
+    # Calculate difference between IMDb Rating and My Rating
+    contoversial_df = ratings_df.copy()
+    contoversial_df['Rating Difference'] = (contoversial_df['IMDb Rating'] - contoversial_df['Your Rating']).abs().round(2)
+    contoversial_df = contoversial_df.sort_values(by='Rating Difference', ascending=False)
+    contoversial_df = contoversial_df[['Title', 'IMDb Rating', 'Your Rating', 'Rating Difference']]
+
+    # Create table of the top 20 controversial ratings
+    top_controversial = contoversial_df.head(20)
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.axis('off')
+    table = ax.table(
+        cellText=top_controversial.values,
+        colLabels=top_controversial.columns,
+        cellLoc='center',
+        loc='center'
+    )
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.auto_set_column_width(col=list(range(len(top_controversial.columns))))
+    # Save the table as a PNG image
+    output_path = os.path.join(OUTPUT_DIR, 'controversial_table.png')
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
 
     # Scatter plot of IMDb Rating vs. My Rating
     ratings_scatterplot = (
