@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from plotnine import ggplot, aes, geom_point, geom_text, element_text, ggtitle, xlab, ylab
+from plotnine import ggplot, aes, geom_point, geom_bar, scale_x_continuous, ggtitle, xlab, ylab
 import matplotlib.pyplot as plt
 
 
@@ -103,6 +103,43 @@ def main():
     # Save the table as a PNG image
     output_path = os.path.join(OUTPUT_DIR, 'controversial_table.png')
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
+
+    # Get the release month of each movie
+    movie_df = ratings_df[ratings_df['Title Type'] == 'Movie']
+    movie_df['Release Date'] = pd.to_datetime(movie_df['Release Date'])
+    movie_df["Release Month"] = movie_df['Release Date'].dt.month
+
+    # Get rating month for each title
+    ratings_df['Date Rated'] = pd.to_datetime(ratings_df['Date Rated'])
+    ratings_df['Rating Month'] = ratings_df['Date Rated'].dt.month
+
+    # Create a histogram of rating months
+    rating_month_histogram = (
+        ggplot(ratings_df, aes(x='Rating Month')) +
+        geom_bar() +
+        ggtitle('Frequency of Ratings by Month') +
+        xlab('Month') +
+        ylab('Number of Ratings') +
+        scale_x_continuous(breaks=range(1, 13), labels=[
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ])
+    )
+    rating_month_histogram.save(os.path.join(OUTPUT_DIR, 'rating_month_histogram.png'))
+
+    # Create a histogram of release months
+    release_month_histogram = (
+        ggplot(movie_df, aes(x='Release Month')) +
+        geom_bar() +
+        ggtitle('Frequency of Movie Releases by Month') +
+        xlab('Month') +
+        ylab('Number of Movies') +
+        scale_x_continuous(breaks=range(1, 13), labels=[
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ])
+    )
+    release_month_histogram.save(os.path.join(OUTPUT_DIR, 'release_month_histogram.png'))
 
     # Scatter plot of IMDb Rating vs. My Rating
     ratings_scatterplot = (
